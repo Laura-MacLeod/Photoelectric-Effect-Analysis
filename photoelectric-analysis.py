@@ -30,7 +30,7 @@ warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 # ------ ALL COLOURS PLOTS ------
 
 
-%matplotlib auto
+%matplotlib inline
 
 # Read in the data
 
@@ -44,41 +44,46 @@ yellow = pd.read_csv('/Users/laura/Library/CloudStorage/OneDrive-ImperialCollege
 
 green_v = green['Voltage [V]']
 green_a = green['Average Current (e-7 A)']
+green_verr = 0.0002*green_v
 green_aerr = green['Standard Deviation']
 
 plt.figure(1)
 plt.plot(green_v, green_a, marker='.', color='green', label='Green')
-plt.errorbar(green_v, green_a, yerr=green_aerr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+plt.errorbar(green_v, green_a, yerr=green_aerr, xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+
 
 
 # Purple
 
 purple_v = purple['Voltage (V)']
 purple_a = purple['Average Current (e-7 A)']
+purple_verr = 0.0002*purple_v
 purple_aerr = purple['Standard Deviation']
 
 plt.plot(purple_v, purple_a, marker='.', color='purple', label='Purple')
-plt.errorbar(purple_v, purple_a, yerr=purple_aerr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+plt.errorbar(purple_v, purple_a, yerr=purple_aerr, xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
 
 
 # Blue
 
 blue_v = blue['Voltage [V]']
 blue_a = blue['Average Current (e-7 A)']
+blue_verr = 0.0002*blue_v
 blue_aerr = blue['Standard Deviation']
 
 plt.plot(blue_v, blue_a, marker='.', color='blue', label='Blue')
-plt.errorbar(blue_v, blue_a, yerr=blue_aerr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+plt.errorbar(blue_v, blue_a, yerr=blue_aerr, xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 
 
 # Yellow
 
 yellow_v = yellow['Voltage [V]']
 yellow_a = yellow['Average Current (e-7 A)']
+yellow_verr = 0.0002*yellow_v
 yellow_aerr = yellow['Standard Deviation']
 
 plt.plot(yellow_v, yellow_a, marker='.', color='orange', label='Yellow')
-plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, xerr=yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
 
 
 # Noise
@@ -86,12 +91,12 @@ plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, elinewidth=3, capsize=4, capt
 plt.plot([-1.25 ,9], [10**-6, 10**-6], color='black', label='Noise')
 
 plt.xlabel('Voltage [V]')
-plt.ylabel('Avereage Current (e-7 A)')
+plt.ylabel('Current (e-7 A)')
 plt.grid()
 plt.legend()
 
-# plt.xlim(-1.3, 0)
-# plt.ylim(-0.03, 0.06)
+plt.xlim(-1.3, 0)
+plt.ylim(-0.03, 0.06)
 
 # plt.savefig("limited-all-colours-graph.png")
 
@@ -100,7 +105,7 @@ plt.legend()
 
 #  ------- VOLTAGE - X, CURRENT = Y -------
 
-%matplotlib auto
+%matplotlib inline
 
 
 #Limit the data to voltages below 0V
@@ -120,8 +125,10 @@ cut_purple_aerr = purple_aerr.iloc[cut_purple_v.index[0]:]
 cut_blue_aerr = blue_aerr.iloc[cut_blue_v.index[0]:]
 cut_yellow_aerr = yellow_aerr.iloc[cut_yellow_v.index[0]:]
 
-
-plt.figure(2)
+cut_green_verr = green_verr.iloc[cut_green_v.index[0]:]
+cut_purple_verr = purple_verr.iloc[cut_purple_v.index[0]:]
+cut_blue_verr = blue_verr.iloc[cut_blue_v.index[0]:]
+cut_yellow_verr = yellow_verr.iloc[cut_yellow_v.index[0]:]
 
 
 
@@ -130,11 +137,11 @@ plt.figure(2)
 # plt.figure('green')
 plt.subplot(2, 2, 1)
 plt.scatter(cut_green_v, cut_green_a, marker='o', color='green', label='Green')
-plt.errorbar(cut_green_v, cut_green_a, yerr=cut_green_aerr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+plt.errorbar(cut_green_v, cut_green_a, yerr=cut_green_aerr, xerr=cut_green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
 
-# Fit cubic to data
+# Fit cubic to data, incorporating y error
 
-green_model = np.poly1d(np.polyfit(cut_green_v, cut_green_a, 3, cov=False))
+green_model = np.poly1d(np.polyfit(cut_green_v, cut_green_a, 3, cov=False, w=1/cut_green_aerr))
 green_model_line = np.linspace(-1, 0, 100)
 plt.plot(green_model_line, green_model(green_model_line))
 
@@ -143,7 +150,7 @@ plt.plot(green_model_line, green_model(green_model_line))
 plt.plot([-1 ,0], [10**-6, 10**-6], color='black', label='Noise')
 
 plt.xlabel('Voltage [V]')
-plt.ylabel('Avereage Current (e-7 A)')
+plt.ylabel('Current (e-7 A)')
 plt.grid()
 plt.title("Green")
 
@@ -153,11 +160,11 @@ plt.title("Green")
 # plt.figure('purple')
 plt.subplot(2, 2, 2)
 plt.scatter(cut_purple_v, cut_purple_a, marker='o', color='purple', label='Purple')
-plt.errorbar(cut_purple_v, cut_purple_a, yerr=cut_purple_aerr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+plt.errorbar(cut_purple_v, cut_purple_a, yerr=cut_purple_aerr, xerr=cut_purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
 
-# Fit cubic to data
+# Fit cubic to data, incorporating y error
 
-purple_model = np.poly1d(np.polyfit(cut_purple_v, cut_purple_a, 3, cov=False))
+purple_model = np.poly1d(np.polyfit(cut_purple_v, cut_purple_a, 3, cov=False, w=1/cut_purple_aerr))
 purple_model_line = np.linspace(-1.3, 0, 100)
 plt.plot(purple_model_line, purple_model(purple_model_line))
 
@@ -166,7 +173,7 @@ plt.plot(purple_model_line, purple_model(purple_model_line))
 plt.plot([-1.25 ,0], [10**-6, 10**-6], color='black', label='Noise')
 
 plt.xlabel('Voltage [V]')
-plt.ylabel('Avereage Current (e-7 A)')
+plt.ylabel('Current (e-7 A)')
 plt.grid()
 plt.title("Purple")
 
@@ -176,11 +183,11 @@ plt.title("Purple")
 # plt.figure('blue')
 plt.subplot(2, 2, 3)
 plt.scatter(cut_blue_v, cut_blue_a, marker='o', color='blue', label='Blue')
-plt.errorbar(cut_blue_v, cut_blue_a, yerr=cut_blue_aerr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+plt.errorbar(cut_blue_v, cut_blue_a, yerr=cut_blue_aerr, xerr=cut_blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 
-# Fit cubic to data
+# Fit cubic to data, incorporating y error
 
-blue_model = np.poly1d(np.polyfit(cut_blue_v, cut_blue_a, 3, cov=False))
+blue_model = np.poly1d(np.polyfit(cut_blue_v, cut_blue_a, 3, cov=False, w=1/cut_blue_aerr))
 blue_model_line = np.linspace(-1, 0, 100)
 plt.plot(blue_model_line, blue_model(blue_model_line))
 
@@ -189,7 +196,7 @@ plt.plot(blue_model_line, blue_model(blue_model_line))
 plt.plot([-1 ,0], [10**-6, 10**-6], color='black', label='Noise')
 
 plt.xlabel('Voltage [V]')
-plt.ylabel('Avereage Current (e-7 A)')
+plt.ylabel('Current (e-7 A)')
 plt.grid()
 plt.title("Blue")
 
@@ -199,11 +206,11 @@ plt.title("Blue")
 # plt.figure('yellow')
 plt.subplot(2, 2, 4)
 plt.scatter(cut_yellow_v, cut_yellow_a, marker='o', color='orange', label='Yellow')
-plt.errorbar(cut_yellow_v, cut_yellow_a, yerr=cut_yellow_aerr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+plt.errorbar(cut_yellow_v, cut_yellow_a, yerr=cut_yellow_aerr, xerr=cut_yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
 
-# Fit cubic to data
+# Fit cubic to data, incorporating y error
 
-yellow_model = np.poly1d(np.polyfit(cut_yellow_v, cut_yellow_a, 3, cov=False))
+yellow_model = np.poly1d(np.polyfit(cut_yellow_v, cut_yellow_a, 3, cov=False, w=1/cut_yellow_aerr))
 yellow_model_line = np.linspace(-1, 0, 100)
 plt.plot(yellow_model_line, yellow_model(yellow_model_line))
 
@@ -212,9 +219,10 @@ plt.plot(yellow_model_line, yellow_model(yellow_model_line))
 plt.plot([-1 ,0], [10**-6, 10**-6], color='black', label='Noise')
 
 plt.xlabel('Voltage [V]')
-plt.ylabel('Avereage Current (e-7 A)')
+plt.ylabel('Current (e-7 A)')
 plt.grid()
 plt.title("Yellow")
+plt.tight_layout()
 
 
 
@@ -255,7 +263,7 @@ def saturation(x, a, b, c, d, e):
 # plt.figure('green')
 plt.subplot(2, 2, 1)
 plt.scatter(cut_green_a, cut_green_v, marker='o', color='green', label='Green')
-plt.errorbar(cut_green_a, cut_green_v, xerr=cut_green_aerr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+plt.errorbar(cut_green_a, cut_green_v, xerr=cut_green_aerr, yerr=cut_green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
 
 guess1 = [1, 2, -1, -4, 1]
 
@@ -277,7 +285,7 @@ plt.title("Green")
 # plt.figure('purple')
 plt.subplot(2, 2, 2)
 plt.scatter(cut_purple_a, cut_purple_v, marker='o', color='purple', label='Purple')
-plt.errorbar(cut_purple_a, cut_purple_v, xerr=cut_purple_aerr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+plt.errorbar(cut_purple_a, cut_purple_v, xerr=cut_purple_aerr, yerr=cut_purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
 
 guess2 = [1, 2, -1, -4, 1]
 
@@ -299,7 +307,7 @@ plt.title("Purple")
 # plt.figure('blue')
 plt.subplot(2, 2, 3)
 plt.scatter(cut_blue_a, cut_blue_v, marker='o', color='blue', label='Blue')
-plt.errorbar(cut_blue_a, cut_blue_v, xerr=cut_blue_aerr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+plt.errorbar(cut_blue_a, cut_blue_v, xerr=cut_blue_aerr, yerr=cut_blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 
 guess3 = [1, 2, -1, -4, 1]
 
@@ -321,7 +329,7 @@ plt.title("Blue")
 # plt.figure('yellow')
 plt.subplot(2, 2, 4)
 plt.scatter(cut_yellow_a, cut_yellow_v, marker='o', color='orange', label='Yellow')
-plt.errorbar(cut_yellow_a, cut_yellow_v, xerr=cut_yellow_aerr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+plt.errorbar(cut_yellow_a, cut_yellow_v, xerr=cut_yellow_aerr, yerr=cut_yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
 
 guess4 = [1, 2, -1, -4, 1]
 
@@ -423,15 +431,99 @@ plt.grid()
 # Find gradient and convert to h value
 
 grad = data[0]
+grad_err = np.sqrt(cov5[0,0])
+
 e = 1.9 * 10**(-19)
 
 h = (grad * e)
+h_err = grad_err*e
 
-print("Planck's constant: ", h)
+
+
+
+print('Gradient', grad, '±', grad_err)
+
+print("Planck's Constant: ", h, '±', h_err)
+
+# print(data)
+# print(cov5)
 
 
 # print(cov5)
 
+
+
+
+
+#%%
+
+# ------- HALF INTENSITY BLUE COMPARISON --------
+
+%matplotlib inline
+
+blue_half = pd.read_csv('/Users/laura/Library/CloudStorage/OneDrive-ImperialCollegeLondon/University/Year 3/PHYS60004 - Third Year Physics Laboratory/Photoelectric Effect/Data/blue_half.csv')
+
+blue_v_half = blue_half['Voltage [V]']
+blue_a_half = blue_half['Average Current (e-7 A)']
+blue_aerr_half = blue_half['Standard Deviation']
+
+
+# Resize data
+
+cut_blue_v_half = blue_v_half[blue_v_half<=0]
+cut_blue_a_half = blue_a_half.iloc[cut_blue_v_half.index[0]:]
+cut_blue_aerr_half = blue_aerr_half.iloc[cut_blue_v_half.index[0]:]
+
+
+# Plot each dataset
+
+plt.figure(1)
+plt.scatter(cut_blue_a_half, cut_blue_v_half, marker='.', color='blue', label='Blue')
+plt.errorbar(cut_blue_a_half, cut_blue_v_half, xerr=cut_blue_aerr_half, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+
+plt.scatter(cut_blue_a, cut_blue_v, marker='.', color='blue', label='Blue')
+plt.errorbar(cut_blue_a, cut_blue_v, xerr=cut_blue_aerr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+
+plt.ylabel('Voltage [V]')
+plt.xlabel('Current (e-7 A)')
+plt.grid()
+
+
+# Fit the datasets
+
+blue_range = np.linspace(cut_blue_a_half[-1:], cut_blue_a_half[:1], 1000)
+blue_range_half = np.linspace(cut_blue_a[-1:], cut_blue_a[:1], 1000)
+
+para3, cov3 = sp.optimize.curve_fit(lncurve, cut_blue_a, cut_blue_v, guess3, maxfev=100000)
+plt.plot(blue_range_half,lncurve(blue_range_half, para3[0], para3[1], para3[2], para3[3], para3[4]), color='deepskyblue')
+mean3 = (para3[1])
+error3 = np.sqrt(cov3[1][1])
+
+para3_half, cov3_half = sp.optimize.curve_fit(lncurve, cut_blue_a_half, cut_blue_v_half, guess3, maxfev=100000)
+plt.plot(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3], para3_half[4]), color='darkblue')
+mean3_half = (para3_half[1])
+error3_half = np.sqrt(cov3_half[1][1])
+
+
+
+# Find and plot the cut-off voltage for each dataset
+
+blue_zero = (intersect(blue_range,lncurve(blue_range, para3[0], para3[1], para3[2], para3[3], para3[4])))
+blue_cutoff = abs(intersect(blue_range,lncurve(blue_range, para3[0], para3[1], para3[2], para3[3], para3[4])))
+
+plt.plot([0, 0, 0], [0, blue_zero, -1], color='grey')
+plt.plot([0], blue_zero, marker='x', color='red', markersize=10)
+
+
+blue_zero_half = (intersect(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3], para3_half[4])))
+blue_cutoff_half = abs(intersect(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3], para3_half[4])))
+
+plt.plot([0], blue_zero_half, marker='x', color='red', markersize=10)
+
+
+
+print(blue_cutoff)
+print(blue_cutoff_half)
 
 
 
