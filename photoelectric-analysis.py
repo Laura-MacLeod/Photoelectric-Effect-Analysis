@@ -9,6 +9,7 @@ Written by Laura MacLeod
 
 """
 
+#%% ------- IMPORTS --------
 
 # ------ IMPORTS -------
 
@@ -19,13 +20,14 @@ import matplotlib.pyplot as plt
 import scipy as sp
 from scipy.optimize import curve_fit
 import scipy.odr.odrpack as odr
+import math
 
 import warnings
 warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 
 
 
-#%%
+#%% ------- ALL COLOURS FULL RANGE PLOTS -------
 
 
 # ------ ALL COLOURS PLOTS ------
@@ -35,10 +37,10 @@ warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 
 # Read in the data
 
-green = pd.read_csv('/Users/laura/Library/CloudStorage/OneDrive-ImperialCollegeLondon/University/Year 3/PHYS60004 - Third Year Physics Laboratory/Photoelectric Effect/Data/green.csv')
-purple = pd.read_csv('/Users/laura/Library/CloudStorage/OneDrive-ImperialCollegeLondon/University/Year 3/PHYS60004 - Third Year Physics Laboratory/Photoelectric Effect/Data/purple.csv')
-blue = pd.read_csv('/Users/laura/Library/CloudStorage/OneDrive-ImperialCollegeLondon/University/Year 3/PHYS60004 - Third Year Physics Laboratory/Photoelectric Effect/Data/blue.csv')
-yellow = pd.read_csv('/Users/laura/Library/CloudStorage/OneDrive-ImperialCollegeLondon/University/Year 3/PHYS60004 - Third Year Physics Laboratory/Photoelectric Effect/Data/yellow.csv')
+green = pd.read_csv('Data/green.csv')
+purple = pd.read_csv('Data/purple.csv')
+blue = pd.read_csv('Data/blue.csv')
+yellow = pd.read_csv('Data/yellow.csv')
 
 
 # Green
@@ -96,13 +98,14 @@ plt.ylabel('Current (e-7 A)')
 plt.grid()
 plt.legend()
 
-plt.xlim(-1.3, 0)
-plt.ylim(-0.03, 0.06)
+# plt.xlim(-1.3, 0)
+# plt.ylim(-0.03, 0.06)
 
 # plt.savefig("limited-all-colours-graph.png")
 
 
-#%%
+
+#%% ------- VOLTAGE - X, CURRENT = Y CUT DATA-------
 
 #  ------- VOLTAGE - X, CURRENT = Y -------
 
@@ -233,7 +236,7 @@ plt.tight_layout()
 
 
 
-#%%
+#%% ------- VOLTAGE - Y, CURRENT = X -------
 
 # ------- VOLTAGE - Y, CURRENT = X -------
 
@@ -447,6 +450,8 @@ gb = np.sqrt(cov1[1][1])
 gc = np.sqrt(cov1[2][2])
 gd = np.sqrt(cov1[3][3])
 
+
+
 # print(ga)
 # print(gb)
 # print(gc)
@@ -454,8 +459,13 @@ gd = np.sqrt(cov1[3][3])
 
 
 gerr = np.sqrt(np.diag(cov1))
+perr = np.sqrt(np.diag(cov2))
+berr = np.sqrt(np.diag(cov3))
+yerr = np.sqrt(np.diag(cov4))
 print(gerr)
-
+print(perr)
+print(berr)
+print(yerr)
 
 
 # Plot graph of cut-off voltages and fit the data with a straight line
@@ -496,27 +506,30 @@ print('Gradient', grad, '±', grad_err)
 
 print("Planck's Constant: ", h, '±', h_err)
 
-# print(data)
-# print(cov5)
+print(data)
+print(cov5)
 
 
-# print(cov5)
+# print(cov2)
 
 # print(freq)
 
-print(para1)
-print(para2)
-print(para3)
-print(para4)
+# print(para1)
+# print(para2)
+# print(para3)
+# print(para4)
+
+print(para4[0])
+print(para4[1])
+print(para4[2])
+print(para4[3])
 
 
-
-
-#%%
+#%% ------- Trying the ODR Pack CUT I-V --------
 
 # ------- Trying the ODR Pack --------
 
-%matplotlib inline
+%matplotlib auto
 
 
 # Function in form for ODR
@@ -529,7 +542,7 @@ def lncurve_odr(B, x):
 
 g_log = odr.Model(lncurve_odr)
 g_vals = odr.RealData(cut_green_a, cut_green_v)
-g_vals2 = odr.ODR(g_vals, b_log, beta0=[0., 0.07175217, 0.01609299, 0.10803696, 2.00043475])
+g_vals2 = odr.ODR(g_vals, g_log, beta0=[0., 0.07175217, 0.01609299, 0.10803696, 2.00043475])
 g_out = g_vals2.run()
 # g_out.pprint()
 g_bet = g_out.beta
@@ -770,7 +783,7 @@ provided standard errors are significantly too big for the beta parameters.
 These errors are not usable.
   
 '''
-#%%
+#%% ------- HALF INTENSITY BLUE COMPARISON CUT I-V--------
 
 # ------- HALF INTENSITY BLUE COMPARISON --------
 
@@ -839,6 +852,510 @@ plt.plot([0], blue_zero_half, marker='x', color='red', markersize=10)
 
 print(blue_cutoff)
 print(blue_cutoff_half)
+
+
+
+
+
+
+#%% ------- LINEARISE GRAPHS TO OBTAIN ERRORS --------
+
+# ------- LINEARISE GRAPHS TO OBTAIN ERRORS --------
+
+
+alin_g = np.log(cut_green_a+0.02)
+vlin_g = np.log(cut_green_v)
+
+alin_p = np.log(cut_purple_a+0.02)
+vlin_p = np.log(cut_purple_v+1)
+
+alin_b = np.log(cut_blue_a+0.02)
+vlin_b = np.log(cut_blue_v+1)
+
+alin_y = np.log(cut_yellow_a+0.02)
+vlin_y = np.log(cut_yellow_v+1)
+
+
+
+plt.figure('green')
+plt.scatter(alin_g, cut_green_v, color='black')
+# plt.xscale('log')
+
+g_fit, g_fiterr =np.polyfit(alin_g, cut_green_v, 1, cov=True)
+g_line = np.poly1d(g_fit)
+g_range = np.linspace(-5.5, -2, 1000)
+plt.plot(g_range, g_line(g_range), color='green')
+
+plt.xlabel("log(Current + 0.02)")
+plt.ylabel("Voltage [V]")
+plt.grid()
+
+
+
+plt.figure('purple')
+plt.scatter(alin_p, cut_purple_v)
+
+p_fit, p_fiterr =np.polyfit(alin_p, cut_purple_v, 1, cov=True)
+p_line = np.poly1d(p_fit)
+p_range = np.linspace(-5.5, -2, 1000)
+plt.plot(p_range, p_line(p_range), color='purple')
+
+plt.xlabel("log(Current + 0.02)")
+plt.ylabel("Voltage [V]")
+plt.grid()
+
+
+
+plt.figure('blue')
+plt.scatter(alin_b, cut_blue_v)
+# plt.xscale('log')
+
+b_fit, b_fiterr =np.polyfit(alin_b, cut_purple_v, 1, cov=True)
+b_line = np.poly1d(b_fit)
+b_range = np.linspace(-5.5, -2, 1000)
+plt.plot(b_range, b_line(b_range), color='blue')
+
+plt.xlabel("log(Current + 0.02)")
+plt.ylabel("Voltage [V]")
+plt.grid()
+
+
+
+plt.figure('yellow')
+plt.scatter(cut_yellow_a+0.02, cut_yellow_v+1)
+plt.yscale('log')
+plt.xscale('log')
+
+y_fit, y_fiterr =np.polyfit(alin_y, cut_purple_v, 1, cov=True)
+y_line = np.poly1d(y_fit)
+y_range = np.linspace(-5.5, -2, 1000)
+plt.plot(y_range, y_line(y_range), color='yellow')
+
+plt.xlabel("log(Current + 0.02)")
+plt.ylabel("Voltage [V]")
+plt.grid()
+
+
+
+
+
+
+# g_fit, g_fiterr =np.polyfit(alin_g, cut_green_v, 1, cov=True)
+
+# odr_lis = []
+# for j in odr_data:
+#     odr_lis.append(j)
+        
+# g_line = np.poly1d(g_fit)
+
+# g_range = np.linspace((3*10**8)/(4*10**-7), (3*10**8) / (6*10**-7), 1000)
+# plt.plot(g_range, g_line(g_range), color='red')
+
+# plt.xlabel("Frequency [Hz]")
+# plt.ylabel("Cut-Off Voltage [V]")
+# plt.grid()
+# plt.legend()
+
+
+# # Find gradient and convert to h value for new and old cutoffs
+
+# odr_grad = odr_data[0]
+# odr_grad_err = np.sqrt(odr_cov5[0,0])
+
+#%% ------- SOME PLOTS? --------
+
+
+
+
+
+
+# ----- Green Plot -----
+
+# plt.figure('green')
+plt.subplot(2, 2, 1)
+plt.scatter(cut_green_a, cut_green_v, marker='o', color='green')
+plt.errorbar(cut_green_a, cut_green_v, xerr=cut_green_aerr, yerr=cut_green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+
+green_range = np.linspace(cut_green_a[-1:]-0.004, (cut_green_a[:1]), 1000)
+
+plt.ylabel('Voltage [V]')
+plt.xlabel('Current (e-7 A)')
+plt.grid()
+plt.title("Green")
+# plt.legend()
+plt.tight_layout()
+
+
+# ----- Purple Plot -----
+
+# plt.figure('purple')
+plt.subplot(2, 2, 2)
+plt.scatter(cut_purple_a, cut_purple_v, marker='o', color='purple', label='Purple')
+plt.errorbar(cut_purple_a, cut_purple_v, xerr=cut_purple_aerr, yerr=cut_purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+
+purple_range = np.linspace(cut_purple_a[-1:]-0.004, (cut_purple_a[:1]), 1000)
+
+
+plt.ylabel('Voltage [V]')
+plt.xlabel('Current (e-7 A)')
+plt.grid()
+plt.title("Purple")
+
+
+# ----- Blue Plot -----
+
+# plt.figure('purple')
+plt.subplot(2, 2, 3)
+plt.scatter(cut_blue_a, cut_blue_v, marker='o', color='blue', label='Blue')
+plt.errorbar(cut_blue_a, cut_blue_v, xerr=cut_blue_aerr, yerr=cut_blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+
+blue_range = np.linspace(cut_blue_a[-1:]-0.004, (cut_blue_a[:1]), 1000)
+
+
+plt.ylabel('Voltage [V]')
+plt.xlabel('Current (e-7 A)')
+plt.grid()
+plt.title("Blue")
+
+
+# ----- Yellow Plot -----
+
+# plt.figure('Yellow')
+plt.subplot(2, 2, 4)
+plt.scatter(cut_yellow_a, cut_yellow_v, marker='o', color='orange', label='Yellow')
+plt.errorbar(cut_yellow_a, cut_yellow_v, xerr=cut_yellow_aerr, yerr=cut_yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+
+yellow_range = np.linspace(cut_yellow_a[-1:]-0.004, (cut_yellow_a[:1]), 1000)
+
+
+plt.ylabel('Voltage [V]')
+plt.xlabel('Current (e-7 A)')
+plt.grid()
+plt.title("Yellow")
+plt.tight_layout()
+
+
+
+
+
+
+
+#%% ------- USE PHYSICAL FUNCTION USING CURVE FIT AND FULL DATA V-I -------
+
+
+%matplotlib inline
+
+plt.figure(1)
+
+plt.scatter(green_v, green_a, marker='.', color='green', label='Green')
+plt.errorbar(green_v, green_a, yerr=green_aerr, xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+
+plt.scatter(purple_v, purple_a, marker='.', color='purple', label='Purple')
+plt.errorbar(purple_v, purple_a, yerr=purple_aerr, xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+
+plt.scatter(blue_v, blue_a, marker='.', color='blue', label='Blue')
+plt.errorbar(blue_v, blue_a, yerr=blue_aerr, xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+
+plt.scatter(yellow_v, yellow_a, marker='.', color='orange', label='Yellow')
+plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, xerr=yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+
+
+plt.plot([-1.25 ,9], [10**-6, 10**-6], color='black', label='Noise')
+
+plt.xlabel('Voltage [V]')
+plt.ylabel('Current (e-7 A)')
+plt.grid()
+plt.legend()
+
+
+def physical(V, Imax, Imin, Vc, Vo):
+    I = Imax + (Imin - Imax)/(1 + np.exp((V - Vc)/(Vo)))
+    return I
+
+guess1 = (1, 0, 1, 1)
+range1 = np.linspace(-2, 10, 1000)
+
+para1, cov1 = sp.optimize.curve_fit(physical, green_v, green_a, guess1, maxfev=100000)
+plt.plot(range1,physical(range1, para1[0], para1[1], para1[2], para1[3]), color='green')
+mean1 = (para1[1])
+error1 = np.sqrt(cov1[1][1])
+
+
+guess2 = (1, 1, 1, 1)
+range2 = np.linspace(-2, 10, 1000)
+
+para2, cov2 = sp.optimize.curve_fit(physical, purple_v, purple_a, guess2, maxfev=100000)
+plt.plot(range2,physical(range2, para2[0], para2[1], para2[2], para2[3]), color='purple')
+mean2 = (para2[1])
+error2 = np.sqrt(cov2[1][1])
+
+
+guess3 = (1, 1, 1, 1)
+range3 = np.linspace(-2, 10, 1000)
+
+para3, cov3 = sp.optimize.curve_fit(physical, blue_v, blue_a, guess3, maxfev=100000)
+plt.plot(range3,physical(range3, para3[0], para3[1], para3[2], para3[3]), color='blue')
+mean3 = (para3[1])
+error3 = np.sqrt(cov3[1][1])
+
+
+guess4 = (1, 1, 1, 1)
+range4 = np.linspace(-2, 10, 1000)
+
+para4, cov4 = sp.optimize.curve_fit(physical, yellow_v, yellow_a, guess4, maxfev=100000)
+plt.plot(range4,physical(range4, para4[0], para4[1], para4[2], para4[3]), color='orange')
+mean4 = (para4[1])
+error4 = np.sqrt(cov4[1][1])
+
+
+#%% ------- CURVE_FIT AND ODR WITH CUT DATA AND PHYSICAL FIT -------
+
+def physical_odr(B, V):
+    # I = Imax + (Imin - Imax)/(1 + np.exp((V - Vc)/(Vo)))
+    I = B[1] + (B[2] - B[1]) / (1 + np.exp((V - B[3])/(B[4])))
+    return I
+
+
+# ---- GREEN -----
+
+plt.subplot(2, 2, 1)
+
+plt.scatter(cut_green_v, cut_green_a, marker='.', color='green', label='Green')
+plt.errorbar(cut_green_v, cut_green_a, yerr=cut_green_aerr, xerr=cut_green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+
+# g_log = odr.Model(physical_odr)
+# g_vals = odr.RealData(cut_green_v, cut_green_a, sy=cut_green_aerr)
+# g_vals2 = odr.ODR(g_vals, g_log, beta0=[0, 0.07175217, 0.01609299, 0.10803696, 2.00043475])
+# g_out = g_vals2.run()
+# g_bet = g_out.beta
+# g_cov = g_out.cov_beta
+
+guess1 = (1, 0, 1, 1)
+range1 = np.linspace(-1.1, 0.1, 1000)
+
+para1, cov1 = sp.optimize.curve_fit(physical, cut_green_v, cut_green_a, guess1, maxfev=100000, sigma=cut_green_aerr)
+mean1 = (para1[1])
+error1 = np.sqrt(cov1[1][1])
+
+plt.plot(range1,physical(range1, para1[0], para1[1], para1[2], para1[3]), color='green')
+# plt.plot(range1,physical(range1, g_bet[1], g_bet[2], g_bet[3], g_bet[4]), color='green')
+
+plt.xlabel('Voltage [V]')
+plt.ylabel('Current (e-7 A)')
+plt.grid()
+plt.tight_layout()
+
+
+print(para1)
+print(np.sqrt(np.diag(cov1)))
+
+print(g_bet)
+stderr = g_out.sd_beta
+print(stderr)
+
+
+
+# ---- PURPLE -----
+
+plt.subplot(2, 2, 2)
+
+plt.scatter(cut_purple_v, cut_purple_a, marker='.', color='purple', label='purple')
+plt.errorbar(cut_purple_v, cut_purple_a, yerr=cut_purple_aerr, xerr=cut_purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+
+# p_log = odr.Model(physical_odr)
+# p_vals = odr.RealData(cut_purple_v, cut_purple_a)
+# p_vals2 = odr.ODR(p_vals, p_log, beta0=[0, 0.07175217, 0.01609299, 0.10803696, 2.00043475])
+# p_out = p_vals2.run()
+# p_bet = p_out.beta
+# p_cov = p_out.cov_beta
+
+guess2 = (1, 0, 1, 1)
+range2 = np.linspace(-1.4, 0.1, 1000)
+
+para2, cov2 = sp.optimize.curve_fit(physical, cut_purple_v, cut_purple_a, guess2, maxfev=100000)
+
+plt.plot(range2,physical(range2, para2[0], para2[1], para2[2], para2[3]), color='purple')
+# plt.plot(range2,physical(range2, p_bet[1], p_bet[2], p_bet[3], p_bet[4]), color='purple')
+
+plt.xlabel('Voltage [V]')
+plt.ylabel('Current (e-7 A)')
+plt.grid()
+plt.tight_layout()
+
+
+# ---- BLUE -----
+
+plt.subplot(2, 2, 3)
+
+plt.scatter(cut_blue_v, cut_blue_a, marker='.', color='blue', label='blue')
+plt.errorbar(cut_blue_v, cut_blue_a, yerr=cut_blue_aerr, xerr=cut_blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+
+# b_log = odr.Model(physical_odr)
+# b_vals = odr.RealData(cut_blue_v, cut_blue_a)
+# b_vals2 = odr.ODR(b_vals, b_log, beta0=[0, 0.07175217, 0.01609299, 0.10803696, 2.00043475])
+# b_out = b_vals2.run()
+# b_bet = b_out.beta
+# b_cov = b_out.cov_beta
+
+guess3 = (1, 0, 1, 1)
+range3 = np.linspace(-1.1, 0.1, 1000)
+
+para3, cov3 = sp.optimize.curve_fit(physical, cut_blue_v, cut_blue_a, guess3, maxfev=100000)
+
+plt.plot(range1,physical(range3, para3[0], para3[1], para3[2], para3[3]), color='blue')
+# plt.plot(range1,physical(range3, b_bet[1], b_bet[2], b_bet[3], b_bet[4]), color='blue')
+
+plt.xlabel('Voltage [V]')
+plt.ylabel('Current (e-7 A)')
+plt.grid()
+plt.tight_layout()
+
+
+
+# ---- YELLOW -----
+
+plt.subplot(2, 2, 4)
+
+plt.scatter(cut_yellow_v, cut_yellow_a, marker='.', color='orange', label='yellow')
+plt.errorbar(cut_yellow_v, cut_yellow_a, yerr=cut_yellow_aerr, xerr=cut_yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+
+# y_log = odr.Model(physical_odr)
+# y_vals = odr.RealData(cut_yellow_v, cut_yellow_a)
+# y_vals2 = odr.ODR(y_vals, y_log, beta0=[0, 1, 1, 1, 1])
+# y_out = y_vals2.run()
+# y_bet = y_out.beta
+# y_cov = y_out.cov_beta
+
+guess4 = (1, 0, 1, 1)
+range4 = np.linspace(-1.1, 0.1, 1000)
+
+para4, cov4 = sp.optimize.curve_fit(physical, cut_yellow_v, cut_yellow_a, guess4, maxfev=100000)
+
+plt.plot(range4,physical(range4, para4[0], para4[1], para4[2], para4[3]), color='orange')
+# plt.plot(range1,physical(range1, y_bet[1], y_bet[2], y_bet[3], y_bet[4]), color='orange')
+
+plt.xlabel('Voltage [V]')
+plt.ylabel('Current (e-7 A)')
+plt.grid()
+plt.tight_layout()
+
+
+
+
+
+#%% ------- FINDING PLANCKS CONSTANT WITH ERRORS ON CUT-OFF V -------
+
+import math
+
+
+def physical(V, Imax, Imin, Vc, Vo):
+    I = Imax + (Imin - Imax)/(1 + np.exp((V - Vc)/(Vo)))
+    return I
+
+def Cutoff(Imax, Imin, Vc, Vo):
+    # I = 0
+    V = Vc + Vo * np.log(-Imin/Imax)
+    return V
+
+def Error_prop(V, Imax, Imin, Vc, Vo, Imax_err, Imin_err, Vc_err, Vo_err):
+    
+    rel_Imin = Imin_err/Imin
+    rel_Imax = Imax_err/Imax
+    log = -Imin/Imax
+    
+   
+    log_err = (log/log) * np.sqrt(rel_Imin**22 + rel_Imax**2)
+    
+    
+    
+    rel_log = log_err/log
+    rel_Vo = Vo_err/Vo
+    
+    V_err = np.sqrt(Vc_err**2 + (Vo * np.log(log) * np.sqrt(rel_Vo**2 + rel_log**2))**2)
+    rel_V = V_err/V
+
+    
+    return V_err
+    
+
+# print(np.sqrt(cov1[0][0]), np.sqrt(cov1[1][1]), np.sqrt(cov1[2][2]), np.sqrt(cov1[3][3]))
+
+
+
+
+g_cutoff = Cutoff(para1[0], para1[1], para1[2], para1[3])
+p_cutoff = Cutoff(para2[0], para2[1], para2[2], para2[3])
+b_cutoff = Cutoff(para3[0], para3[1], para3[2], para3[3])
+y_cutoff = Cutoff(para4[0], para4[1], para4[2], para4[3])
+
+
+
+final_cutoffs = [abs(g_cutoff), abs(p_cutoff), abs(b_cutoff), abs(y_cutoff)]
+
+g_cutoff_err = Error_prop(abs(g_cutoff), para1[0], para1[1], para1[2], para1[3], np.sqrt(cov1[0][0]), np.sqrt(cov1[1][1]), np.sqrt(cov1[2][2]), np.sqrt(cov1[3][3]))
+p_cutoff_err = Error_prop(abs(p_cutoff), para2[0], para2[1], para2[2], para2[3], np.sqrt(cov2[0][0]), np.sqrt(cov2[1][1]), np.sqrt(cov2[2][2]), np.sqrt(cov2[3][3]))
+b_cutoff_err = Error_prop(abs(b_cutoff), para3[0], para3[1], para3[2], para3[3], np.sqrt(cov3[0][0]), np.sqrt(cov3[1][1]), np.sqrt(cov3[2][2]), np.sqrt(cov3[3][3]))
+y_cutoff_err = Error_prop(abs(y_cutoff), para4[0], para4[1], para4[2], para4[3], np.sqrt(cov4[0][0]), np.sqrt(cov4[1][1]), np.sqrt(cov4[2][2]), np.sqrt(cov4[3][3]))
+
+
+print(g_cutoff_err)
+print(p_cutoff_err)
+print(b_cutoff_err)
+print(y_cutoff_err)
+
+
+
+
+
+
+
+
+
+plt.scatter(freq, final_cutoffs)
+
+
+
+phys_fit, phys_cov = np.polyfit(freq, final_cutoffs, 1, cov=True)
+phys_line = np.poly1d(phys_fit)
+
+phys_range = np.linspace(5e14, 7.5e14, 1000)
+
+plt.plot(phys_range, phys_line(phys_range))
+
+# print(phys_line)
+
+
+
+
+
+
+
+# Find gradient and convert to h value
+
+grad = phys_fit[0]
+grad_err = np.sqrt(phys_cov[0])
+
+e = 1.9 * 10**(-19)
+
+h = (grad * e)
+h_err = grad_err*e
+
+
+
+
+# print('Gradient', grad, '±', grad_err)
+
+# print("Planck's Constant: ", h, '±', h_err)
+
+# print(data)
+# print(cov5)
+
+
+
+
+
+
+
 
 
 
