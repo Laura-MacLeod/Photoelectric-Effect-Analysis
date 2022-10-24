@@ -1381,10 +1381,10 @@ h_err = grad_err*e
 
 # Read in the data
 
-green = pd.read_csv('Data/green.csv')
-purple = pd.read_csv('Data/purple.csv')
-blue = pd.read_csv('Data/blue.csv')
-yellow = pd.read_csv('Data/yellow.csv')
+green = pd.read_csv('Data/green_new.csv')
+purple = pd.read_csv('Data/purple_new.csv')
+blue = pd.read_csv('Data/blue_new.csv')
+yellow = pd.read_csv('Data/yellow_new.csv')
 
 
 def physical(V, Imax, Imin, Vc, Vo):
@@ -1401,13 +1401,13 @@ green_a = green['Average Current (e-7 A)']
 green_verr = 0.04*green_v
 green_aerr = green['Standard Deviation']
 
-green_v = green_v[green_v<=0]
-green_a = green_a.iloc[cut_green_v.index[0]:]
-green_aerr = green_aerr.iloc[cut_green_v.index[0]:]
-green_verr = green_verr.iloc[cut_green_v.index[0]:]
+# green_v = green_v[green_v<=0]
+# green_a = green_a.iloc[green_v.index[0]:]
+# green_aerr = green_aerr.iloc[green_v.index[0]:]
+# green_verr = green_verr.iloc[green_v.index[0]:]
 
-# plt.subplot(2, 2, 1)
-plt.figure('g')
+plt.subplot(2, 2, 1)
+# plt.figure('g')
 plt.scatter(green_v, green_a, marker='.', color='green', label='Green')
 plt.errorbar(green_v, green_a, yerr=green_aerr, xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
 plt.xlabel('Voltage [V]')
@@ -1420,7 +1420,7 @@ range1 = np.linspace(-8, 10, 1000)
 # range1 = np.linspace(-2, 10, 1000)
 
 paras1, covs1 = sp.optimize.curve_fit(physical, green_v, green_a, guess1, maxfev=100000)
-plt.plot(range1,physical(range1, paras1[0], paras1[1], paras1[2], paras1[3]), color='green')
+plt.plot(range1,physical(range1, paras1[0], paras1[1], paras1[2], paras1[3]), color='black')
 mean1 = (paras1[1])
 error1 = np.sqrt(covs1[1][1])
 
@@ -1433,13 +1433,13 @@ purple_a = purple['Average Current (e-7 A)']
 purple_verr = 0.04*purple_v
 purple_aerr = purple['Standard Deviation']
 
-purple_v = purple_v[purple_v<=0]
-purple_a = purple_a.iloc[cut_purple_v.index[0]:]
-purple_aerr = purple_aerr.iloc[cut_purple_v.index[0]:]
-purple_verr = purple_verr.iloc[cut_purple_v.index[0]:]
+# purple_v = purple_v[purple_v<=0]
+# purple_a = purple_a.iloc[purple_v.index[0]:]
+# purple_aerr = purple_aerr.iloc[purple_v.index[0]:]
+# purple_verr = purple_verr.iloc[purple_v.index[0]:]
 
-# plt.subplot(2, 2, 2)
-plt.figure('p')
+plt.subplot(2, 2, 2)
+# plt.figure('p')
 plt.scatter(purple_v, purple_a, marker='.', color='purple', label='Purple')
 plt.errorbar(purple_v, purple_a, yerr=purple_aerr, xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
 plt.xlabel('Voltage [V]')
@@ -1448,10 +1448,10 @@ plt.grid()
 plt.legend()
 
 guess2 = (1, 1, 1, 1)
-range2 = np.linspace(-2, 10, 1000)
+range2 = np.linspace(-7.5, 10, 1000)
 
 paras2, covs2 = sp.optimize.curve_fit(physical, purple_v, purple_a, guess2, maxfev=100000)
-plt.plot(range2,physical(range2, paras2[0], paras2[1], paras2[2], paras2[3]), color='purple')
+plt.plot(range2,physical(range2, paras2[0], paras2[1], paras2[2], paras2[3]), color='black')
 mean2 = (paras2[1])
 error2 = np.sqrt(covs2[1][1])
 
@@ -1464,13 +1464,13 @@ blue_a = blue['Average Current (e-7 A)']
 blue_verr = 0.04*blue_v
 blue_aerr = blue['Standard Deviation']
 
-blue_v = blue_v[blue_v<=0]
-blue_a = blue_a.iloc[cut_blue_v.index[0]:]
-blue_aerr = blue_aerr.iloc[cut_blue_v.index[0]:]
-blue_verr = blue_verr.iloc[cut_blue_v.index[0]:]
+# blue_v = blue_v[blue_v<=0]
+# blue_a = blue_a.iloc[blue_v.index[0]:]
+# blue_aerr = blue_aerr.iloc[blue_v.index[0]:]
+# blue_verr = blue_verr.iloc[blue_v.index[0]:]
 
-# plt.subplot(2, 2, 3)
-plt.figure('b')
+plt.subplot(2, 2, 3)
+# plt.figure('b')
 plt.scatter(blue_v, blue_a, marker='.', color='blue', label='Blue')
 plt.errorbar(blue_v, blue_a, yerr=blue_aerr, xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 plt.xlabel('Voltage [V]')
@@ -1483,7 +1483,7 @@ range3 = np.linspace(-7, 10, 1000)
 # range3 = np.linspace(-2.5, 10, 1000)
 
 paras3, covs3 = sp.optimize.curve_fit(physical, blue_v, blue_a, guess3, maxfev=100000)
-plt.plot(range3,physical(range3, paras3[0], paras3[1], paras3[2], paras3[3]), color='blue')
+plt.plot(range3,physical(range3, paras3[0], paras3[1], paras3[2], paras3[3]), color='black')
 mean3 = (paras3[1])
 error3 = np.sqrt(covs3[1][1])
 
@@ -1496,13 +1496,13 @@ yellow_a = yellow['Average Current (e-7 A)']
 yellow_verr = 0.04*yellow_v
 yellow_aerr = yellow['Standard Deviation']
 
-yellow_v = yellow_v[yellow_v<=0]
-yellow_a = yellow_a.iloc[cut_yellow_v.index[0]:]
-yellow_aerr = yellow_aerr.iloc[cut_yellow_v.index[0]:]
-yellow_verr = yellow_verr.iloc[cut_yellow_v.index[0]:]
+# yellow_v = yellow_v[yellow_v<=0]
+# yellow_a = yellow_a.iloc[yellow_v.index[0]:]
+# yellow_aerr = yellow_aerr.iloc[yellow_v.index[0]:]
+# yellow_verr = yellow_verr.iloc[yellow_v.index[0]:]
 
-# plt.subplot(2, 2, 4)
-plt.figure('y')
+plt.subplot(2, 2, 4)
+# plt.figure('y')
 plt.scatter(yellow_v, yellow_a, marker='.', color='orange', label='Yellow')
 plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, xerr=yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
 plt.xlabel('Voltage [V]')
@@ -1511,16 +1511,16 @@ plt.grid()
 plt.legend()
 
 guess4 = (1, 1, 1, 1)
-range4 = np.linspace(-2, 10, 1000)
+range4 = np.linspace(-9, 10, 1000)
 
 paras4, covs4 = sp.optimize.curve_fit(physical, yellow_v, yellow_a, guess4, maxfev=100000)
-plt.plot(range4,physical(range4, paras4[0], paras4[1], paras4[2], paras4[3]), color='orange')
+plt.plot(range4,physical(range4, paras4[0], paras4[1], paras4[2], paras4[3]), color='black')
 mean4 = (paras4[1])
 error4 = np.sqrt(covs4[1][1])
 
 # print('full')
 # print(' ')
-print(paras1)
+# print(paras1)
 # print(np.sqrt(np.diag(covs1)))
 # print(' ')
 # # print(paras2)
@@ -1578,13 +1578,14 @@ def MaxMinError(Imax, Imin, Vc, Vo, Imax_err, Imin_err, Vc_err, Vo_err):
     lower_Vc = Vc - Vc_err
     lower_Vo = Vo - Vo_err
     
-    upper_V = Cutoff(lower_Imax, upper_Imin, upper_Vc, lower_Vo)
-    lower_V = Cutoff(upper_Imax, lower_Imin, lower_Vc, upper_Vo)
+    upper_V = Cutoff(upper_Imax, upper_Imin, upper_Vc, lower_Vo)
+    lower_V = Cutoff(lower_Imax, lower_Imin, lower_Vc, upper_Vo)
     
     range_V = abs(upper_V - lower_V)
     err = 0.5 * range_V
     return err
 
+print(paras1[0], paras1[1], paras1[2], paras1[3])
 print([np.sqrt(covs1[0][0]), np.sqrt(covs1[1][1]), np.sqrt(covs1[2][2]), np.sqrt(covs1[3][3])])
 
 
@@ -1596,7 +1597,7 @@ p_errs = (MaxMinError(paras2[0], paras2[1], paras2[2], paras2[3], np.sqrt(covs2[
 b_errs = (MaxMinError(paras3[0], paras3[1], paras3[2], paras3[3], np.sqrt(covs3[0][0]), np.sqrt(covs3[1][1]), np.sqrt(covs3[2][2]), np.sqrt(covs3[3][3])))
 y_errs = (MaxMinError(paras4[0], paras4[1], paras4[2], paras4[3], np.sqrt(covs4[0][0]), np.sqrt(covs4[1][1]), np.sqrt(covs4[2][2]), np.sqrt(covs4[3][3])))
 
-# print(g_cutoff, '±', g_errs)
+print(g_cutoff, '±', g_errs)
 # print(p_cutoff, '±', p_errs)
 # print(b_cutoff, '±', b_errs)
 # print(y_cutoff, '±', y_errs)
@@ -1622,15 +1623,13 @@ freq_err = [g_freq_err, p_freq_err, b_freq_err, y_freq_err]
 
 
 
-
-
 plt.figure(5)
 
 plt.scatter(freq, final_cutoffs)
 
 
 
-phys_fit, phys_covs = np.polyfit(freq, final_cutoffs, 1, cov=True, w=1/v_errors)
+phys_fit, phys_covs = np.polyfit(freq, final_cutoffs, 1, cov=True)
 phys_line = np.poly1d(phys_fit)
 
 phys_range = np.linspace(5e14, 7.5e14, 1000)
