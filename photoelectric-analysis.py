@@ -37,10 +37,10 @@ warnings.filterwarnings(action='ignore', category=DeprecationWarning)
 
 # Read in the data
 
-green = pd.read_csv('Data/green.csv')
-purple = pd.read_csv('Data/purple.csv')
-blue = pd.read_csv('Data/blue.csv')
-yellow = pd.read_csv('Data/yellow.csv')
+green = pd.read_csv('green.csv')
+purple = pd.read_csv('purple.csv')
+blue = pd.read_csv('blue.csv')
+yellow = pd.read_csv('yellow.csv')
 
 
 # Green
@@ -789,7 +789,7 @@ These errors are not usable.
 
 %matplotlib inline
 
-blue_half = pd.read_csv('Data/blue_half.csv')
+blue_half = pd.read_csv('blue_half.csv')
 
 blue_v_half = blue_half['Voltage [V]']
 blue_a_half = blue_half['Average Current (e-7 A)']
@@ -1381,10 +1381,10 @@ h_err = grad_err*e
 
 # Read in the data
 
-green = pd.read_csv('Data/green_new.csv')
-purple = pd.read_csv('Data/purple_new.csv')
-blue = pd.read_csv('Data/blue_new.csv')
-yellow = pd.read_csv('Data/yellow_new.csv')
+green = pd.read_csv('green_new.csv')
+purple = pd.read_csv('purple_new.csv')
+blue = pd.read_csv('blue_new.csv')
+yellow = pd.read_csv('yellow_new.csv')
 
 
 def physical(V, Imax, Imin, Vc, Vo):
@@ -1658,16 +1658,34 @@ e = 1.9 * 10**(-19)
 h = (grad * e)
 h_err = grad_err*e
 
-print("Planck's Constant: ", format(h, '.1E'), '±', format(h_err, '.0E'))
+print("Planck's Constant: ", format(h, '.1e'), '±', format(h_err, '.0e'))
 
+intercept = phys_fit[1]
+intercept_err = np.sqrt(phys_covs[1][1])
 
-# print("Planck's Constant: %0.40f ± %0.2f" % (h, h_err))
-
-
+print("Collector Work Function: ", format(-intercept, '0.3g'), '±', format(intercept_err, '.0e'))
 
 
 
 # print(MaxMinError(0.6064676,  -0.16780082,  1.13092095 , 1.25423715, 0.1399743, 0.06303824, 0.82390963, 0.17274326))
 
+
+
+# Find the x-intercept of the linear fit
+
+def Linear(grad, yint):
+    # V = grad*f + yint
+    # With V=0:
+    f = (-yint) / grad
+    return f
+
+cutoff_freq = Linear(phys_fit[0], phys_fit[1])
+
+cutoff_wl = 3*10**8 / cutoff_freq
+
+print(format(cutoff_freq, '.4e'))
+
+emitter_wf = 6.63*(10**(-34)) * cutoff_freq / (1.6*(10**(-19)))
+print(format(emitter_wf, '.4e'))
 
 
