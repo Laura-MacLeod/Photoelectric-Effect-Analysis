@@ -6,6 +6,8 @@ Created on Tue Oct 18 11:42:26 2022
 @author: mattk
 """
 
+%matplotlib inline
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -14,7 +16,7 @@ from scipy.optimize import curve_fit
 '''
 read in all data and seperate
 '''
-data = pd.read_csv('Data/QE_data.csv')
+data = pd.read_csv('QE_data.csv')
 light = data['light av']
 current = data['current average']
 light_error = data['light std dev']
@@ -107,6 +109,10 @@ def cal_QE(wavelength, gradient):
 
 qg, qp, qy, qb = cal_QE(546*10**-9, mg), cal_QE(405*10**-9, mp), cal_QE(578*10**-9,my), cal_QE(436*10**-9, mb)
 
+wavelengths = [546, 405, 578, 436]
+QE = [qg*100, qp*100, qy*100, qb*100]
+
+plt.figure(5)
 plt.plot(546, qg*100,'o',color =  'green')
 plt.plot(405, qp*100,'o',color =  'purple')
 plt.plot(578, qy*100,'o',color =  'orange')
@@ -114,3 +120,32 @@ plt.plot(436, qb*100,'o',color =  'blue')
 plt.grid()
 plt.xlabel('Wavelength (nm)')
 plt.ylabel('Quantum Efficiency (%)')
+
+
+
+
+
+def exp(wl, a, b, c, d):
+    QE = a + b * np.exp(c * wl + d)
+    return QE
+
+rang = np.linspace(400, 580, 1000)
+guess = [1, 1, -1, 1]
+
+paras, covs = sp.optimize.curve_fit(exp, wavelengths, QE, guess, maxfev=100000)
+plt.plot(rang, exp(rang, paras[0], paras[1], paras[2], paras[3]), color='black')
+# mean4 = (paras[1])
+# error4 = np.sqrt(covs4[1][1])
+
+
+
+
+
+
+
+
+
+
+
+
+

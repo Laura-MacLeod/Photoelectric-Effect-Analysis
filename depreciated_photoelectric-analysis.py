@@ -43,6 +43,11 @@ blue = pd.read_csv('blue.csv')
 yellow = pd.read_csv('yellow.csv')
 
 
+# intensity_ratio = [500, 400, 1000, 60]
+# intensity_ratio = [100, 405, 500, 26]
+# intensity_ratio = [100, 750, 3000, 50]
+intensity_ratio = [0.0150, 0.60, 0.195, 0.0050] #actually quantum efficiency values
+
 # Green
 
 green_v = green['Voltage [V]']
@@ -51,8 +56,8 @@ green_verr = 0.04*green_v
 green_aerr = green['Standard Deviation']
 
 plt.figure(1)
-plt.plot(green_v, green_a, marker='.', color='green', label='Green')
-plt.errorbar(green_v, green_a, yerr=green_aerr, xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
+plt.plot(green_v, green_a/intensity_ratio[0], marker='.', color='green', label='Green')
+plt.errorbar(green_v, green_a/intensity_ratio[0], yerr=green_aerr/intensity_ratio[0], xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
 
 
 
@@ -63,8 +68,8 @@ purple_a = purple['Average Current (e-7 A)']
 purple_verr = 0.04*purple_v
 purple_aerr = purple['Standard Deviation']
 
-plt.plot(purple_v, purple_a, marker='.', color='purple', label='Purple')
-plt.errorbar(purple_v, purple_a, yerr=purple_aerr, xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
+plt.plot(purple_v, purple_a/intensity_ratio[1], marker='.', color='purple', label='Purple')
+plt.errorbar(purple_v, purple_a/intensity_ratio[1], yerr=purple_aerr/intensity_ratio[1], xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
 
 
 # Blue
@@ -74,8 +79,8 @@ blue_a = blue['Average Current (e-7 A)']
 blue_verr = 0.04*blue_v
 blue_aerr = blue['Standard Deviation']
 
-plt.plot(blue_v, blue_a, marker='.', color='blue', label='Blue')
-plt.errorbar(blue_v, blue_a, yerr=blue_aerr, xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+plt.plot(blue_v, blue_a/intensity_ratio[2], marker='.', color='blue', label='Blue')
+plt.errorbar(blue_v, blue_a/intensity_ratio[2], yerr=blue_aerr/intensity_ratio[2], xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 
 
 # Yellow
@@ -85,8 +90,8 @@ yellow_a = yellow['Average Current (e-7 A)']
 yellow_verr = 0.04*yellow_v
 yellow_aerr = yellow['Standard Deviation']
 
-plt.plot(yellow_v, yellow_a, marker='.', color='orange', label='Yellow')
-plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, xerr=yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
+plt.plot(yellow_v, yellow_a/intensity_ratio[3], marker='.', color='orange', label='Yellow')
+plt.errorbar(yellow_v, yellow_a/intensity_ratio[3], yerr=yellow_aerr/intensity_ratio[3], xerr=yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
 
 
 # Noise
@@ -806,14 +811,14 @@ cut_blue_aerr_half = blue_aerr_half.iloc[cut_blue_v_half.index[0]:]
 # Plot each dataset
 
 plt.figure(1)
-plt.scatter(cut_blue_a_half, cut_blue_v_half, marker='.', color='blue', label='Blue')
-plt.errorbar(cut_blue_a_half, cut_blue_v_half, xerr=cut_blue_aerr_half, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+plt.scatter(cut_blue_v_half, cut_blue_a_half, marker='.', color='blue', label='Blue')
+plt.errorbar(cut_blue_v_half, cut_blue_a_half, yerr=cut_blue_aerr_half, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 
-plt.scatter(cut_blue_a, cut_blue_v, marker='.', color='blue', label='Blue')
-plt.errorbar(cut_blue_a, cut_blue_v, xerr=cut_blue_aerr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
+plt.scatter(cut_blue_v, cut_blue_a, marker='.', color='blue', label='Blue')
+plt.errorbar(cut_blue_v, cut_blue_a, yerr=cut_blue_aerr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
 
-plt.ylabel('Voltage [V]')
-plt.xlabel('Current (e-7 A)')
+plt.xlabel('Voltage [V]')
+plt.ylabel('Current (e-7 A)')
 plt.grid()
 
 
@@ -823,12 +828,12 @@ blue_range = np.linspace(cut_blue_a_half[-1:], cut_blue_a_half[:1], 1000)
 blue_range_half = np.linspace(cut_blue_a[-1:], cut_blue_a[:1], 1000)
 
 para3, cov3 = sp.optimize.curve_fit(lncurve, cut_blue_a, cut_blue_v, guess3, maxfev=100000)
-plt.plot(blue_range_half,lncurve(blue_range_half, para3[0], para3[1], para3[2], para3[3]), color='deepskyblue')
+# plt.plot(blue_range_half,lncurve(blue_range_half, para3[0], para3[1], para3[2], para3[3]), color='deepskyblue')
 mean3 = (para3[1])
 error3 = np.sqrt(cov3[1][1])
 
 para3_half, cov3_half = sp.optimize.curve_fit(lncurve, cut_blue_a_half, cut_blue_v_half, guess3, maxfev=100000)
-plt.plot(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3]), color='darkblue')
+# plt.plot(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3]), color='darkblue')
 mean3_half = (para3_half[1])
 error3_half = np.sqrt(cov3_half[1][1])
 
@@ -840,13 +845,13 @@ blue_zero = (intersect(blue_range,lncurve(blue_range, para3[0], para3[1], para3[
 blue_cutoff = abs(intersect(blue_range,lncurve(blue_range, para3[0], para3[1], para3[2], para3[3])))
 
 plt.plot([0, 0, 0], [0, blue_zero, -1], color='grey')
-plt.plot([0], blue_zero, marker='x', color='red', markersize=10)
+# plt.plot([0], blue_zero, marker='x', color='red', markersize=10)
 
 
 blue_zero_half = (intersect(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3])))
 blue_cutoff_half = abs(intersect(blue_range,lncurve(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3])))
 
-plt.plot([0], blue_zero_half, marker='x', color='red', markersize=10)
+# plt.plot([0], blue_zero_half, marker='x', color='red', markersize=10)
 
 
 
@@ -1393,6 +1398,16 @@ def physical(V, Imax, Imin, Vc, Vo):
 
 
 
+# plt.rcParams['figure.figsize'] = [9, 5]
+# # plt.rcParams.update({'font.size': 30})
+# plt.rcParams['font.size'] = 20
+
+# plt.rc('axes', labelsize=40)
+# plt.rc('font.size', size=20)
+# plt.rc('xtick', labelsize=20)
+# plt.rc('ytick', labelsize=20)
+
+
 
 # -------- Green --------
 
@@ -1406,14 +1421,15 @@ green_aerr = green['Standard Deviation']
 # green_aerr = green_aerr.iloc[green_v.index[0]:]
 # green_verr = green_verr.iloc[green_v.index[0]:]
 
-plt.subplot(2, 2, 1)
+fig1 = plt.subplot(2, 2, 1)
 # plt.figure('g')
 plt.scatter(green_v, green_a, marker='.', color='green', label='Green')
-plt.errorbar(green_v, green_a, yerr=green_aerr, xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='green', ls='None')
-plt.xlabel('Voltage [V]')
-plt.ylabel('Current (e-7 A)')
+plt.errorbar(green_v, green_a, yerr=green_aerr, xerr=green_verr, elinewidth=3, capsize=4, capthick=1.8, color='mediumseagreen', ls='None')
+
+plt.ylabel(' ')
 plt.grid()
-plt.legend()
+# plt.legend()
+plt.tight_layout(h_pad=-3.5)
 
 guess1 = (1, 0, 1, 1)
 range1 = np.linspace(-8, 10, 1000)
@@ -1424,6 +1440,7 @@ plt.plot(range1,physical(range1, paras1[0], paras1[1], paras1[2], paras1[3]), co
 mean1 = (paras1[1])
 error1 = np.sqrt(covs1[1][1])
 
+fig1.text(-15, -0.5, "Current (e-7 A)", rotation="vertical", va="center")
 
 
 # --------- Purple ----------
@@ -1438,14 +1455,15 @@ purple_aerr = purple['Standard Deviation']
 # purple_aerr = purple_aerr.iloc[purple_v.index[0]:]
 # purple_verr = purple_verr.iloc[purple_v.index[0]:]
 
-plt.subplot(2, 2, 2)
+fig2 = plt.subplot(2, 2, 2)
 # plt.figure('p')
-plt.scatter(purple_v, purple_a, marker='.', color='purple', label='Purple')
-plt.errorbar(purple_v, purple_a, yerr=purple_aerr, xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='purple', ls='None')
-plt.xlabel('Voltage [V]')
-plt.ylabel('Current (e-7 A)')
+plt.scatter(purple_v, purple_a, marker='.', color='mediumpurple', label='Purple')
+plt.errorbar(purple_v, purple_a, yerr=purple_aerr, xerr=purple_verr, elinewidth=3, capsize=4, capthick=1.8, color='mediumpurple', ls='None')
+# plt.xlabel('Voltage [V]')
+# plt.ylabel('Current (e-7 A)')
 plt.grid()
-plt.legend()
+# plt.legend()
+plt.tight_layout(h_pad=-3.5)
 
 guess2 = (1, 1, 1, 1)
 range2 = np.linspace(-7.5, 10, 1000)
@@ -1471,12 +1489,14 @@ blue_aerr = blue['Standard Deviation']
 
 plt.subplot(2, 2, 3)
 # plt.figure('b')
-plt.scatter(blue_v, blue_a, marker='.', color='blue', label='Blue')
-plt.errorbar(blue_v, blue_a, yerr=blue_aerr, xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='blue', ls='None')
-plt.xlabel('Voltage [V]')
-plt.ylabel('Current (e-7 A)')
+plt.scatter(blue_v, blue_a, marker='.', color='deepskyblue', label='Blue')
+plt.errorbar(blue_v, blue_a, yerr=blue_aerr, xerr=blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='deepskyblue', ls='None')
+plt.xlabel(' ')
+# plt.ylabel('Current (e-7 A)')
 plt.grid()
-plt.legend()
+# plt.legend()
+
+
 
 guess3 = [ 1.68560729, -0.05340647 , 0.29381379,  0.33281975]
 range3 = np.linspace(-7, 10, 1000)
@@ -1487,7 +1507,7 @@ plt.plot(range3,physical(range3, paras3[0], paras3[1], paras3[2], paras3[3]), co
 mean3 = (paras3[1])
 error3 = np.sqrt(covs3[1][1])
 
-
+fig1.text(7, -2.8, "Voltage [V]", rotation="horizontal", va="center")
 
 # ----------- Yellow ------------
 
@@ -1505,10 +1525,10 @@ plt.subplot(2, 2, 4)
 # plt.figure('y')
 plt.scatter(yellow_v, yellow_a, marker='.', color='orange', label='Yellow')
 plt.errorbar(yellow_v, yellow_a, yerr=yellow_aerr, xerr=yellow_verr, elinewidth=3, capsize=4, capthick=1.8, color='orange', ls='None')
-plt.xlabel('Voltage [V]')
-plt.ylabel('Current (e-7 A)')
+# plt.xlabel('Voltage [V]')
+# plt.ylabel('Current (e-7 A)')
 plt.grid()
-plt.legend()
+# plt.legend()
 
 guess4 = (1, 1, 1, 1)
 range4 = np.linspace(-9, 10, 1000)
@@ -1517,6 +1537,9 @@ paras4, covs4 = sp.optimize.curve_fit(physical, yellow_v, yellow_a, guess4, maxf
 plt.plot(range4,physical(range4, paras4[0], paras4[1], paras4[2], paras4[3]), color='black')
 mean4 = (paras4[1])
 error4 = np.sqrt(covs4[1][1])
+
+
+plt.savefig("Voltage-Current Final Subplot")
 
 # print('full')
 # print(' ')
@@ -1625,6 +1648,7 @@ freq_err = [g_freq_err, p_freq_err, b_freq_err, y_freq_err]
 
 plt.figure(5)
 
+plt.rc('font', size=15)
 plt.scatter(freq, final_cutoffs)
 
 
@@ -1683,9 +1707,9 @@ cutoff_freq = Linear(phys_fit[0], phys_fit[1])
 
 cutoff_wl = 3*10**8 / cutoff_freq
 
-print(format(cutoff_freq, '.4e'))
+print('Cut-off Wavelength: ', format(cutoff_wl, '.4e'))
 
 emitter_wf = 6.63*(10**(-34)) * cutoff_freq / (1.6*(10**(-19)))
-print(format(emitter_wf, '.4e'))
+print('Emitter Work Function: ', format(emitter_wf, '.4g'))
 
 
