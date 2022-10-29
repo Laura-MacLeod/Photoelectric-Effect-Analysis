@@ -63,29 +63,34 @@ xb = np.linspace(0,0.00045,100)
 plot all data
 '''
 
+plt.rcParams['figure.figsize'] = [8, 5]
+# plt.rcParams.update({'font.size': 30})
+plt.rcParams['font.size'] = 20
+
+
 
 fig, axs = plt.subplots(2, 2)
 axs[0, 0].errorbar(g_light, g_curr,g_curr_err,g_light_err,'o',color = 'green',capsize = 4)
 axs[0, 0].plot(xg,xg*pg[0]+pg[1])
-axs[0, 0].set_title("green")
+# axs[0, 0].set_title("green")
 axs[0, 0].grid()
 axs[0, 0].set_ylabel('Current [A]')
 axs[0, 0].set_xlabel('Intensity')
 axs[1, 0].errorbar(p_light,p_curr,p_curr_err,p_light_err,'o',color = 'purple',capsize = 4)
 axs[1, 0].plot(xp,xp*pp[0]+pp[1])
-axs[1, 0].set_title("purple")
+# axs[1, 0].set_title("purple")
 axs[1, 0].grid()
 axs[1, 0].set_ylabel('Current [A]')
 axs[1, 0].set_xlabel('Intensity')
 axs[0, 1].errorbar(y_light, y_curr,y_curr_err,y_light_err,'o',color = 'orange',capsize = 4)
 axs[0, 1].plot(xy,xy*py[0]+py[1])
-axs[0, 1].set_title("yellow")
+# axs[0, 1].set_title("yellow")
 axs[0, 1].grid()
 axs[0, 1].set_ylabel('Current [A]')
 axs[0, 1].set_xlabel('Intensity')
 axs[1, 1].errorbar(b_light,b_curr,b_curr_err,b_light_err,'o',color = 'blue',capsize = 4)
 axs[1, 1].plot(xb,xb*pb[0]+pb[1])
-axs[1, 1].set_title("blue")
+# axs[1, 1].set_title("blue")
 axs[1, 1].grid()
 axs[1, 1].set_ylabel('Current [A]')
 axs[1, 1].set_xlabel('Intensity')
