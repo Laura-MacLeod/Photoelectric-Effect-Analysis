@@ -847,15 +847,16 @@ cut_blue_verr_half = blue_verr_half.iloc[cut_blue_v_half.index[0]:]
 # Plot each dataset
 
 plt.figure(1)
-plt.scatter(cut_blue_v_half, cut_blue_a_half, marker='.', color='darkblue', label='Blue')
+plt.scatter(cut_blue_v_half, cut_blue_a_half, marker='.', color='darkblue')
 plt.errorbar(cut_blue_v_half, cut_blue_a_half, yerr=cut_blue_aerr_half, xerr=cut_blue_verr_half, elinewidth=3, capsize=4, capthick=1.8, color='darkblue', ls='None')
 
-plt.scatter(cut_blue_v, cut_blue_a, marker='.', color='deepskyblue', label='Blue')
+plt.scatter(cut_blue_v, cut_blue_a, marker='.', color='deepskyblue')
 plt.errorbar(cut_blue_v, cut_blue_a, yerr=cut_blue_aerr, xerr=cut_blue_verr, elinewidth=3, capsize=4, capthick=1.8, color='deepskyblue', ls='None')
 
 plt.xlabel('Voltage [V]')
 plt.ylabel('Current (e-7 A)')
 plt.grid()
+plt.title("Blue cut-off voltages at different intensities")
 
 
 # Fit the datasets
@@ -864,12 +865,12 @@ blue_range = np.linspace(cut_blue_v_half[-1:], cut_blue_v_half[:1], 1000)
 blue_range_half = np.linspace(cut_blue_v[-1:], cut_blue_v[:1], 1000)
 
 para3, cov3 = sp.optimize.curve_fit(physical, cut_blue_v, cut_blue_a, guess3, maxfev=100000)
-plt.plot(blue_range_half, physical(blue_range_half, para3[0], para3[1], para3[2], para3[3]), color='deepskyblue')
+plt.plot(blue_range_half, physical(blue_range_half, para3[0], para3[1], para3[2], para3[3]), color='deepskyblue', label='100% intensity')
 mean3 = (para3[1])
 error3 = np.sqrt(cov3[1][1])
 
 para3_half, cov3_half = sp.optimize.curve_fit(physical, cut_blue_v_half, cut_blue_a_half, guess3, maxfev=100000)
-plt.plot(blue_range,physical(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3]), color='darkblue')
+plt.plot(blue_range,physical(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3]), color='darkblue', label='50% intensity')
 mean3_half = (para3_half[1])
 error3_half = np.sqrt(cov3_half[1][1])
 
@@ -881,7 +882,7 @@ blue_zero = (intersect(physical(blue_range, para3[0], para3[1], para3[2], para3[
 blue_cutoff = abs(intersect(blue_range,physical(blue_range, para3[0], para3[1], para3[2], para3[3])))
 
 plt.plot([0, blue_zero, -1], [0, 0, 0], color='grey')
-plt.plot(blue_zero, [0], marker='x', color='red', markersize=14)
+plt.plot(blue_zero, [0], marker='x', color='red', markersize=14, label='Cut-off voltage', ls='none')
 
 
 blue_zero_half = (intersect(physical(blue_range, para3_half[0], para3_half[1], para3_half[2], para3_half[3]),blue_range))
@@ -889,7 +890,7 @@ blue_cutoff_half = abs(intersect(physical(blue_range, para3_half[0], para3_half[
 
 plt.plot(blue_zero_half, [0], marker='x', color='red', markersize=14)
 
-
+plt.legend()
 
 print(blue_cutoff)
 print(blue_cutoff_half)
